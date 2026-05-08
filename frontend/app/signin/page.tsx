@@ -1,6 +1,55 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { AxiosError } from "axios";
 
 export default function SignInPage() {
+  const { login, user } = useAuth();
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  if (user) {
+    const dest =
+      user.role === "ADMIN"
+        ? "/admin"
+        : user.role === "MENTOR"
+          ? "/mentor"
+          : "/dashboard";
+    router.replace(dest);
+    return null;
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await login(email, password);
+      // Auth context will set user, triggering the redirect above on re-render
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data?.error ?? "Login failed. Please try again.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-24">
       <div className="w-full max-w-md flex flex-col gap-10">
@@ -23,7 +72,13 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <form className="flex flex-col gap-5">
+        {error && (
+          <div className="rounded-lg bg-red-500/10 text-red-600 px-4 py-3 text-sm" role="alert">
+            {error}
+          </div>
+        )}
+
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           <label className="flex flex-col gap-2 text-sm">
             <span className="text-(--muted) text-xs uppercase tracking-[0.18em]">
               Email
@@ -32,7 +87,10 @@ export default function SignInPage() {
               type="email"
               required
               placeholder="you@domain.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-(--fg)/5 rounded-lg px-4 py-3 outline-none focus:bg-(--fg)/8 transition-colors"
+              autoComplete="email"
             />
           </label>
           <label className="flex flex-col gap-2 text-sm">
@@ -43,15 +101,28 @@ export default function SignInPage() {
               type="password"
               required
               placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-(--fg)/5 rounded-lg px-4 py-3 outline-none focus:bg-(--fg)/8 transition-colors"
+              autoComplete="current-password"
             />
           </label>
-          <button
-            type="submit"
-            className="mt-2 self-start rounded-full bg-(--accent) text-(--accent-fg) px-7 py-3.5 text-sm hover:opacity-90 transition-opacity cursor-pointer"
-          >
-            Sign in
-          </button>
+
+          <div className="flex items-center justify-between">
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-full bg-(--accent) text-(--accent-fg) px-7 py-3.5 text-sm hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Signing in…" : "Sign in"}
+            </button>
+            <Link
+              href="/forgot-password"
+              className="text-xs text-(--muted) hover:text-(--fg) transition-colors"
+            >
+              Forgot password?
+            </Link>
+          </div>
         </form>
 
         <p className="text-sm text-(--muted)">
