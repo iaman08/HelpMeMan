@@ -21,20 +21,6 @@ Build **HelpMeMan** — a premium mentorship platform where students and profess
 - Frontend: Next.js 14 (App Router) + Tailwind CSS + shadcn/ui
 - Deployment-ready: environment variables for all secrets
 
-
-**Tech stack:**
-- Backend: Node.js + Express (REST API)
-- Database: PostgreSQL with Prisma ORM
-- Auth: JWT (access + refresh tokens) + bcrypt password hashing
-- Email: Nodemailer (SMTP) or SendGrid
-- Payments: Razorpay (primary) with Stripe fallback
-- Meetings: Google Calendar API + Google Meet link generation
-- File storage: Cloudinary (profile photos, verification docs)
-- Search: Prisma full-text search + category/tag filtering
-- Real-time chat: Socket.io (pre-booking chat threads)
-- Frontend: Next.js 14 (App Router) + Tailwind CSS + shadcn/ui
-- Deployment-ready: environment variables for all secrets
-
 ---
 
 ## Database Schema (PostgreSQL + Prisma)
