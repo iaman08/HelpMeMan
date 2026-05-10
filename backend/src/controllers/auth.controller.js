@@ -24,6 +24,9 @@ async function register(req, res) {
 
     const token = generateEmailToken({ userId: user.id, type: 'email_verify' });
     const verificationUrl = `${config.frontendUrl}/verify-email?token=${token}`;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n📧 [DEV] Email verification URL for ${user.email}:\n${verificationUrl}\n`);
+    }
     await sendEmail({ to: user.email, subject: 'Verify your email — HelpMeMan', html: emailVerificationTemplate(user, verificationUrl) });
 
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
@@ -62,6 +65,9 @@ async function registerMentor(req, res) {
     // Send OTP to institution email
     const otp = generateOTP();
     storeOTP(institutionEmail, otp);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n🔑 [DEV] OTP for ${institutionEmail}: ${otp}\n`);
+    }
     await sendEmail({ to: institutionEmail, subject: 'HelpMeMan — Verify your institution email', html: otpEmailTemplate(institutionEmail, otp) });
 
     // Store pending registration data in session/temp (simplified: store in response for client to send back)
