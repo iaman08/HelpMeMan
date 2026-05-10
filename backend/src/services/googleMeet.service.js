@@ -40,8 +40,23 @@ async function createMeetingEvent({ booking, mentor, user }) {
   }
 }
 
+async function updateMeetingEvent(googleEventId, newScheduledAt, durationMinutes) {
+  try {
+    const event = {
+      start: { dateTime: new Date(newScheduledAt).toISOString(), timeZone: 'Asia/Kolkata' },
+      end: {
+        dateTime: new Date(new Date(newScheduledAt).getTime() + durationMinutes * 60000).toISOString(),
+        timeZone: 'Asia/Kolkata',
+      },
+    };
+    await calendar.events.patch({ calendarId: 'primary', eventId: googleEventId, resource: event, sendUpdates: 'all' });
+  } catch (error) {
+    console.error('Update event error:', error);
+  }
+}
+
 async function cancelMeetingEvent(googleEventId) {
   try { await calendar.events.delete({ calendarId: 'primary', eventId: googleEventId, sendUpdates: 'all' }); } catch (e) { console.error('Cancel event error:', e); }
 }
 
-module.exports = { createMeetingEvent, cancelMeetingEvent };
+module.exports = { createMeetingEvent, cancelMeetingEvent, updateMeetingEvent };

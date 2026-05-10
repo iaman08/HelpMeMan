@@ -48,6 +48,9 @@ export default function BookingDetailPage() {
   const [comment, setComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [newDate, setNewDate] = useState("");
+  const [rescheduling, setRescheduling] = useState(false);
 
   useEffect(() => {
     api
@@ -56,6 +59,21 @@ export default function BookingDetailPage() {
       .catch(() => setError("Failed to load booking"))
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleReschedule() {
+    if (!newDate) return alert("Please select a date and time");
+    setRescheduling(true);
+    try {
+      await api.patch(`/bookings/${id}/reschedule`, { scheduledAt: newDate });
+      setBooking(prev => prev && { ...prev, scheduledAt: newDate });
+      setRescheduleOpen(false);
+      alert("Session rescheduled successfully!");
+    } catch (err) {
+      alert("Failed to reschedule session.");
+    } finally {
+      setRescheduling(false);
+    }
+  }
 
   async function handleCancel() {
     if (!confirm("Are you sure you want to cancel this session?")) return;
@@ -321,6 +339,49 @@ export default function BookingDetailPage() {
               <button
                 type="button"
                 onClick={() => setReviewOpen(false)}
+                className="rounded-full bg-(--fg)/5 px-6 py-3 text-sm hover:bg-(--fg)/8 cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Reschedule Modal ─── */}
+      {rescheduleOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div
+            className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+            style={{ background: "var(--bg)" }}
+          >
+            <h2 className="font-display text-2xl">Reschedule Session</h2>
+            
+            <label className="flex flex-col gap-2 text-sm">
+              <span className="text-(--muted) text-xs uppercase tracking-[0.18em]">
+                New Date & Time
+              </span>
+              <input
+                type="datetime-local"
+                value={newDate}
+                onChange={(e) => setNewDate(e.target.value)}
+                className="bg-(--fg)/5 rounded-lg px-4 py-3 outline-none focus:bg-(--fg)/8 transition-colors"
+                min={new Date().toISOString().slice(0, 16)}
+              />
+            </label>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleReschedule}
+                disabled={rescheduling}
+                className="flex-1 rounded-full bg-(--accent) text-(--accent-fg) py-3 text-sm hover:opacity-90 cursor-pointer disabled:opacity-50"
+              >
+                {rescheduling ? "Rescheduling…" : "Confirm Reschedule"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setRescheduleOpen(false)}
                 className="rounded-full bg-(--fg)/5 px-6 py-3 text-sm hover:bg-(--fg)/8 cursor-pointer"
               >
                 Cancel

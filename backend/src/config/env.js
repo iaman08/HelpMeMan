@@ -40,4 +40,11 @@ module.exports = {
     notificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL,
   },
   platformFeePercent: parseInt(process.env.PLATFORM_FEE_PERCENT, 10) || 20,
+  groq: {
+    apiKey: process.env.GROQ_API_KEY,
+  },
+  upstash: {
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  },
 };

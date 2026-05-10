@@ -69,4 +69,46 @@ async function getMeetLink(req, res) {
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 }
 
-module.exports = { createBooking, verifyPayment, getMeetLink };
+async function rescheduleBooking(req, res) {
+  try {
+    const { id } = req.params;
+    const { scheduledAt } = req.body;
+
+    if (!scheduledAt) {
+      return res.status(400).json({ error: 'New schedule time is required' });
+    }
+
+    const booking = await prisma.booking.findUnique({
+      where: { id },
+      include: { user: true, mentor: { include: { user: true } } },
+    });
+
+    if (!booking) return res.status(404).json({ error: 'Booking not found' });
+
+    // Auth check: student or mentor
+    if (booking.userId !== req.user.id && booking.mentor.userId !== req.user.id) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    const updated = await prisma.booking.update({
+      where: { id },
+      data: { scheduledAt: new Date(scheduledAt) },
+    });
+
+    // Update Google Calendar
+    if (booking.googleEventId) {
+      const { updateMeetingEvent } = require('../services/googleMeet.service');
+      await updateMeetingEvent(booking.googleEventId, scheduledAt, booking.durationMinutes);
+    }
+
+    // Notifications
+    const { createNotification } = require('../services/notification.service');
+    const msg = `Session rescheduled to ${new Date(scheduledAt).toLocaleString()}`;
+    await createNotification({ userId: booking.userId, type: 'BOOKING_RESCHEDULED', title: 'Session Rescheduled', body: msg });
+    await createNotification({ mentorId: booking.mentorId, type: 'BOOKING_RESCHEDULED', title: 'Session Rescheduled', body: msg });
+
+    res.json({ booking: updated });
+  } catch (e) { console.error(e); res.status(500).json({ error: 'Failed to reschedule' }); }
+}
+
+module.exports = { createBooking, verifyPayment, getMeetLink, rescheduleBooking };

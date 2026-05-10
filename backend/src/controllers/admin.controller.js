@@ -8,7 +8,7 @@ async function getDashboard(req, res) {
     const startOfDay = new Date(now.setHours(0, 0, 0, 0));
     const startOfWeek = new Date(now); startOfWeek.setDate(startOfWeek.getDate() - 7);
     const startOfMonth = new Date(now); startOfMonth.setMonth(startOfMonth.getMonth() - 1);
-
+    
     const [totalUsers, totalMentors, pendingMentors, approvedMentors, rejectedMentors, totalBookings, todayBookings, weekBookings, totalRevenue, pendingApprovals] = await Promise.all([
       prisma.user.count(),
       prisma.mentor.count(),

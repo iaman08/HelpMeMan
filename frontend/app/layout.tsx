@@ -3,6 +3,7 @@ import { Geist, Fraunces } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/lib/auth-context";
+import { AIChatWidget } from "@/components/AIChatWidget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             {children}
+            <AIChatWidget />
           </AuthProvider>
         </ThemeProvider>
       </body>
