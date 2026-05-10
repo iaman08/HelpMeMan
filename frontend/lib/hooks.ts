@@ -20,7 +20,7 @@ export interface MentorFilters {
   q?: string;
   category?: string;
   institutionType?: string;
-  minPrice?: number;
+  minPrice?: number;    
   maxPrice?: number;
   minRating?: number;
   sortBy?: string;
