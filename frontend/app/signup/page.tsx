@@ -7,20 +7,20 @@ import { useAuth } from "@/lib/auth-context";
 import { AxiosError } from "axios";
 
 export default function SignUpPage() {
-  const { register, user } = useAuth();
+  const { register, user, loading } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) router.replace("/dashboard");
-  }, [user, router]);
+    if (!loading && user) router.replace("/dashboard");
+  }, [user, loading, router]);
 
-  if (user) return null;
+  if (loading || user) return null;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -39,7 +39,7 @@ export default function SignUpPage() {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     try {
       await register(name.trim(), email, password);
     } catch (err) {
@@ -51,7 +51,7 @@ export default function SignUpPage() {
         setError("Something went wrong. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -132,10 +132,10 @@ export default function SignUpPage() {
           </label>
           <button
             type="submit"
-            disabled={loading}
+            disabled={submitting}
             className="mt-2 self-start rounded-full bg-(--accent) text-(--accent-fg) px-7 py-3.5 text-sm hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating account…" : "Create account"}
+            {submitting ? "Creating account…" : "Create account"}
           </button>
         </form>
 

@@ -7,16 +7,16 @@ import { useAuth } from "@/lib/auth-context";
 import { AxiosError } from "axios";
 
 export default function SignInPage() {
-  const { login, user } = useAuth();
+  const { login, user, loading } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       const dest =
         user.role === "ADMIN"
           ? "/admin"
@@ -25,9 +25,10 @@ export default function SignInPage() {
             : "/dashboard";
       router.replace(dest);
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
-  if (user) return null;
+  // Don't render form while checking auth or if already logged in
+  if (loading || user) return null;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -38,7 +39,7 @@ export default function SignInPage() {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     try {
       await login(email, password);
       // Auth context will set user, triggering the redirect above on re-render
@@ -49,7 +50,7 @@ export default function SignInPage() {
         setError("Something went wrong. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
@@ -114,10 +115,10 @@ export default function SignInPage() {
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              disabled={loading}
+                          disabled={submitting}
               className="rounded-full bg-(--accent) text-(--accent-fg) px-7 py-3.5 text-sm hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {submitting ? "Signing in…" : "Sign in"}
             </button>
             <Link
               href="/forgot-password"
