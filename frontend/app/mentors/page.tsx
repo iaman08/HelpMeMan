@@ -7,6 +7,7 @@ import { useMentors, useCategories, type MentorFilters } from "@/lib/hooks";
 import { MentorCard } from "@/components/MentorCard";
 import { MentorCardSkeleton } from "@/components/Skeleton";
 import { EmptyState } from "@/components/EmptyState";
+import { Navbar } from "@/components/Navbar";
 
 const SORT_OPTIONS = [
   { value: "rating", label: "Top Rated" },
@@ -64,32 +65,7 @@ export default function MentorsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* ─── Header ─── */}
-      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-(--bg)/70">
-        <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 sm:px-10 py-5">
-          <Link
-            href="/"
-            className="font-display text-2xl tracking-tight"
-            aria-label="HelpMeMan home"
-          >
-            HelpMeMan<span className="text-(--muted)">.</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/signin"
-              className="text-sm text-(--fg)/80 hover:text-(--fg) transition-colors"
-            >
-              Sign in
-            </Link>
-            <Link
-              href="/signup"
-              className="text-sm rounded-full bg-(--accent) text-(--accent-fg) px-5 py-2.5 hover:opacity-90 transition-opacity"
-            >
-              Sign up
-            </Link>
-          </div>
-        </nav>
-      </header>
+      <Navbar />
 
       <main className="mx-auto max-w-[1400px] px-6 sm:px-10 pt-28 pb-16">
         {/* ─── Page Title ─── */}
