@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { AxiosError } from "axios";
 
@@ -15,16 +15,19 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
 
   // Redirect if already logged in
-  if (user) {
-    const dest =
-      user.role === "ADMIN"
-        ? "/admin"
-        : user.role === "MENTOR"
-          ? "/mentor"
-          : "/dashboard";
-    router.replace(dest);
-    return null;
-  }
+  useEffect(() => {
+    if (user) {
+      const dest =
+        user.role === "ADMIN"
+          ? "/admin"
+          : user.role === "MENTOR"
+            ? "/mentor"
+            : "/dashboard";
+      router.replace(dest);
+    }
+  }, [user, router]);
+
+  if (user) return null;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
