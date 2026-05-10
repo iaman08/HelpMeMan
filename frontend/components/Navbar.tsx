@@ -6,11 +6,7 @@ import { useTheme, type Theme, THEMES } from "./ThemeProvider";
 import { useAuth } from "@/lib/auth-context";
 import { LayoutDashboard, LogOut, ChevronDown, Menu, X } from "lucide-react";
 
-const links = [
-  { id: "about", label: "About" },
-  { id: "how", label: "How It Works" },
-  { id: "pricing", label: "Pricing" },
-];
+const links: { id: string; label: string }[] = [];
 
 const themeLabels: Record<Theme, string> = {
   light: "Light",
@@ -76,25 +72,6 @@ export function Navbar() {
           HelpMeMan<span className="text-(--muted)">.</span>
         </button>
 
-        {/* Desktop nav links */}
-        <div className="hidden md:flex items-center gap-10 text-sm">
-          {links.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              onClick={() => scrollToId(l.id)}
-              className="text-(--fg)/80 hover:text-(--fg) transition-colors cursor-pointer"
-            >
-              {l.label}
-            </button>
-          ))}
-          <Link
-            href="/mentors"
-            className="text-(--fg)/80 hover:text-(--fg) transition-colors"
-          >
-            Mentors
-          </Link>
-        </div>
 
         {/* Right side */}
         <div className="flex items-center gap-4 sm:gap-5">
@@ -236,26 +213,7 @@ export function Navbar() {
           className="md:hidden border-t border-(--hairline) px-6 py-4 flex flex-col gap-3"
           style={{ background: "var(--bg)" }}
         >
-          {links.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              onClick={() => {
-                scrollToId(l.id);
-                setMobileOpen(false);
-              }}
-              className="text-sm text-(--fg)/80 hover:text-(--fg) text-left py-1 cursor-pointer"
-            >
-              {l.label}
-            </button>
-          ))}
-          <Link
-            href="/mentors"
-            onClick={() => setMobileOpen(false)}
-            className="text-sm text-(--fg)/80 hover:text-(--fg) py-1"
-          >
-            Mentors
-          </Link>
+
 
           {!user && (
             <Link
